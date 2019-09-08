@@ -25,7 +25,7 @@ CAUGHT_MESSAGES = []
 
 
 def singer_write_message_no_cow(message):
-    if isinstance(message, singer.RecordMessage) and message.stream != 'CHICKEN':
+    if isinstance(message, singer.RecordMessage) and message.stream != 'ROOT-CHICKEN':
         raise Exception("simulated exception")
     else:
         CAUGHT_MESSAGES.append(message)
@@ -101,14 +101,14 @@ class CurrentlySyncing(unittest.TestCase):
             self.assertTrue(isinstance(CAUGHT_MESSAGES[1], singer.StateMessage))
             self.assertTrue(isinstance(CAUGHT_MESSAGES[2], singer.ActivateVersionMessage))
             self.assertTrue(isinstance(CAUGHT_MESSAGES[3], singer.RecordMessage))
-            self.assertEqual('CHICKEN', CAUGHT_MESSAGES[3].stream)
+            self.assertEqual('ROOT-CHICKEN', CAUGHT_MESSAGES[3].stream)
             self.assertTrue(isinstance(CAUGHT_MESSAGES[4], singer.ActivateVersionMessage))
             self.assertTrue(isinstance(CAUGHT_MESSAGES[5], singer.StateMessage))
             self.assertEqual(None, singer.get_currently_syncing( CAUGHT_MESSAGES[5].value))
 
             #cow messages
             self.assertTrue(isinstance(CAUGHT_MESSAGES[6], singer.SchemaMessage))
-            self.assertEqual("COW", CAUGHT_MESSAGES[6].stream)
+            self.assertEqual("ROOT-COW", CAUGHT_MESSAGES[6].stream)
             self.assertTrue(isinstance(CAUGHT_MESSAGES[7], singer.StateMessage))
             old_state = CAUGHT_MESSAGES[7].value
             self.assertEqual("ROOT-COW", old_state.get('currently_syncing'))
@@ -126,7 +126,7 @@ class CurrentlySyncing(unittest.TestCase):
             self.assertTrue(isinstance(CAUGHT_MESSAGES[1], singer.StateMessage))
             self.assertEqual("ROOT-COW", singer.get_currently_syncing(CAUGHT_MESSAGES[1].value))
             self.assertTrue(isinstance(CAUGHT_MESSAGES[2], singer.RecordMessage))
-            self.assertEqual('COW', CAUGHT_MESSAGES[2].stream)
+            self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[2].stream)
             self.assertTrue(isinstance(CAUGHT_MESSAGES[3], singer.ActivateVersionMessage))
             self.assertTrue(isinstance(CAUGHT_MESSAGES[4], singer.StateMessage))
             self.assertEqual(None, singer.get_currently_syncing( CAUGHT_MESSAGES[4].value))
@@ -136,7 +136,7 @@ class CurrentlySyncing(unittest.TestCase):
             self.assertTrue(isinstance(CAUGHT_MESSAGES[6], singer.StateMessage))
             self.assertEqual("ROOT-CHICKEN", singer.get_currently_syncing(CAUGHT_MESSAGES[6].value))
             self.assertTrue(isinstance(CAUGHT_MESSAGES[7], singer.RecordMessage))
-            self.assertEqual('CHICKEN', CAUGHT_MESSAGES[7].stream)
+            self.assertEqual('ROOT-CHICKEN', CAUGHT_MESSAGES[7].stream)
             self.assertTrue(isinstance(CAUGHT_MESSAGES[8], singer.ActivateVersionMessage))
             self.assertTrue(isinstance(CAUGHT_MESSAGES[9], singer.StateMessage))
             self.assertEqual(None, singer.get_currently_syncing( CAUGHT_MESSAGES[9].value))
