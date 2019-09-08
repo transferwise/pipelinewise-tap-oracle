@@ -49,11 +49,19 @@ def row_to_singer_message(stream, row, version, columns, time_extracted):
 
     rec = dict(zip(columns, row_to_persist))
 
+<<<<<<< HEAD
     return singer.RecordMessage(
        stream=stream.tap_stream_id,
        record=rec,
        version=version,
        time_extracted=time_extracted)
+=======
+   return singer.RecordMessage(
+      stream=stream.tap_stream_id,
+      record=rec,
+      version=version,
+      time_extracted=time_extracted)
+>>>>>>> 132f7fa (use tap_stream_id as stream in singer messages)
 
 def OutputTypeHandler(cursor, name, defaultType, size, precision, scale):
     if defaultType == cx_Oracle.NUMBER:
