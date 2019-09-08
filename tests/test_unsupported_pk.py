@@ -68,7 +68,7 @@ class UnsupportedPK(unittest.TestCase):
                               (): {'is-view': False, 'row-count': 0,
                                    'table-key-properties': [],
                                    'schema-name': 'ROOT',
-                                   'database-name': 'ORCL'},
+                                   'database-name': os.getenv('TAP_ORACLE_SID')},
                               ('properties', 'INTERVAL_COLUMN'): {'inclusion': 'unsupported',
                                                                   'selected-by-default': False,
                                                                   'sql-datatype': 'INTERVAL DAY(2) TO SECOND(6)'}})
