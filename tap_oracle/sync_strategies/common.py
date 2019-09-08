@@ -20,7 +20,7 @@ def send_schema_message(stream, bookmark_properties):
     else:
         key_properties = s_md.get((), {}).get('table-key-properties')
 
-    schema_message = singer.SchemaMessage(stream=stream.stream,
+    schema_message = singer.SchemaMessage(stream=stream.tap_stream_id,
                                           schema=stream.schema.to_dict(),
                                           key_properties=key_properties,
                                           bookmark_properties=bookmark_properties)
@@ -50,10 +50,10 @@ def row_to_singer_message(stream, row, version, columns, time_extracted):
     rec = dict(zip(columns, row_to_persist))
 
     return singer.RecordMessage(
-        stream=stream.stream,
-        record=rec,
-        version=version,
-        time_extracted=time_extracted)
+       stream=stream.tap_stream_id,
+       record=rec,
+       version=version,
+       time_extracted=time_extracted)
 
 def OutputTypeHandler(cursor, name, defaultType, size, precision, scale):
     if defaultType == cx_Oracle.NUMBER:

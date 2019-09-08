@@ -81,7 +81,7 @@ def row_to_singer_message(stream, row, version, columns, time_extracted):
 
     rec = dict(zip(columns, row_to_persist))
     return singer.RecordMessage(
-        stream=stream.stream,
+        stream=stream.tap_stream_id,
         record=rec,
         version=version,
         time_extracted=time_extracted)

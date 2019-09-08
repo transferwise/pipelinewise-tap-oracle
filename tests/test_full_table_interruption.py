@@ -121,7 +121,7 @@ class LogicalInterruption(unittest.TestCase):
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[3], singer.RecordMessage))
         self.assertEqual(CAUGHT_MESSAGES[3].record, {'NAME': 'betty', 'ID': 1, 'COLOUR': 'blue'})
-        self.assertEqual('COW', CAUGHT_MESSAGES[3].stream)
+        self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[3].stream)
         self.assertEqual(first_version, CAUGHT_MESSAGES[3].version)
 
 
@@ -132,7 +132,7 @@ class LogicalInterruption(unittest.TestCase):
         self.assertEqual(first_version, CAUGHT_MESSAGES[4].value['bookmarks']['ROOT-COW']['version'])
 
         self.assertEqual(CAUGHT_MESSAGES[5].record['NAME'], 'smelly')
-        self.assertEqual('COW', CAUGHT_MESSAGES[5].stream)
+        self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[5].stream)
         self.assertEqual(first_version, CAUGHT_MESSAGES[5].version)
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[6], singer.StateMessage))
@@ -160,7 +160,7 @@ class LogicalInterruption(unittest.TestCase):
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[2], singer.RecordMessage))
         self.assertEqual(CAUGHT_MESSAGES[2].record, {'COLOUR': 'brow', 'ID': 2, 'NAME': 'smelly'})
-        self.assertEqual('COW', CAUGHT_MESSAGES[2].stream)
+        self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[2].stream)
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[3], singer.StateMessage))
         self.assertTrue(CAUGHT_MESSAGES[3].value['bookmarks']['ROOT-COW'].get('ORA_ROWSCN'), last_ora_rowscn)
@@ -169,7 +169,7 @@ class LogicalInterruption(unittest.TestCase):
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[4], singer.RecordMessage))
         self.assertEqual(CAUGHT_MESSAGES[4].record['NAME'], 'pooper')
-        self.assertEqual('COW', CAUGHT_MESSAGES[4].stream)
+        self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[4].stream)
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[5], singer.StateMessage))
         self.assertTrue(CAUGHT_MESSAGES[5].value['bookmarks']['ROOT-COW'].get('ORA_ROWSCN') > last_ora_rowscn)
@@ -258,7 +258,7 @@ class FullTableInterruption(unittest.TestCase):
         new_version = CAUGHT_MESSAGES[2].version
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[3], singer.RecordMessage))
-        self.assertEqual('CHICKEN', CAUGHT_MESSAGES[3].stream)
+        self.assertEqual('ROOT-CHICKEN', CAUGHT_MESSAGES[3].stream)
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[4], singer.StateMessage))
         #ORA_ROWSCN is set while we are processing the full table replication
@@ -276,7 +276,7 @@ class FullTableInterruption(unittest.TestCase):
         #cow messages
         self.assertTrue(isinstance(CAUGHT_MESSAGES[7], singer.SchemaMessage))
 
-        self.assertEqual("COW", CAUGHT_MESSAGES[7].stream)
+        self.assertEqual("ROOT-COW", CAUGHT_MESSAGES[7].stream)
         self.assertTrue(isinstance(CAUGHT_MESSAGES[8], singer.StateMessage))
         self.assertIsNone(CAUGHT_MESSAGES[8].value['bookmarks']['ROOT-COW'].get('ORA_ROWSCN'))
         self.assertEqual("ROOT-COW", CAUGHT_MESSAGES[8].value['currently_syncing'])
@@ -286,7 +286,7 @@ class FullTableInterruption(unittest.TestCase):
         self.assertTrue(isinstance(CAUGHT_MESSAGES[10], singer.RecordMessage))
 
         self.assertEqual(CAUGHT_MESSAGES[10].record['NAME'], 'betty')
-        self.assertEqual('COW', CAUGHT_MESSAGES[10].stream)
+        self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[10].stream)
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[11], singer.StateMessage))
         #ORA_ROWSCN is set while we are processing the full table replication
@@ -295,7 +295,7 @@ class FullTableInterruption(unittest.TestCase):
 
 
         self.assertEqual(CAUGHT_MESSAGES[12].record['NAME'], 'smelly')
-        self.assertEqual('COW', CAUGHT_MESSAGES[12].stream)
+        self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[12].stream)
 
         old_state = CAUGHT_MESSAGES[13].value
         self.assertIsNotNone(CAUGHT_MESSAGES[13].value['bookmarks']['ROOT-COW']['ORA_ROWSCN'])
@@ -321,7 +321,7 @@ class FullTableInterruption(unittest.TestCase):
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[2], singer.RecordMessage))
         self.assertEqual(CAUGHT_MESSAGES[2].record['NAME'], 'smelly')
-        self.assertEqual('COW', CAUGHT_MESSAGES[2].stream)
+        self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[2].stream)
 
 
         #after record: activate version, state with no ORA_ROWSCN or currently syncing
@@ -332,7 +332,7 @@ class FullTableInterruption(unittest.TestCase):
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[4], singer.RecordMessage))
         self.assertEqual(CAUGHT_MESSAGES[4].record['NAME'], 'pooper')
-        self.assertEqual('COW', CAUGHT_MESSAGES[4].stream)
+        self.assertEqual('ROOT-COW', CAUGHT_MESSAGES[4].stream)
 
         self.assertTrue(isinstance(CAUGHT_MESSAGES[5], singer.StateMessage))
         self.assertIsNotNone(CAUGHT_MESSAGES[5].value['bookmarks']['ROOT-COW']['ORA_ROWSCN'])
