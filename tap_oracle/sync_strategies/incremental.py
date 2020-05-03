@@ -41,7 +41,7 @@ def sync_table(conn_config, stream, state, desired_columns):
       singer.write_message(singer.StateMessage(value=copy.deepcopy(state)))
 
    activate_version_message = singer.ActivateVersionMessage(
-      stream=stream.stream,
+      stream=stream.tap_stream_id,
       version=stream_version)
    singer.write_message(activate_version_message)
 
