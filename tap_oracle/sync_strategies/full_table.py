@@ -49,7 +49,7 @@ def sync_view(conn_config, stream, state, desired_columns):
    escaped_schema  = schema_name
    escaped_table   = stream.table
    activate_version_message = singer.ActivateVersionMessage(
-      stream=stream.stream,
+      stream=stream.tap_stream_id,
       version=nascent_stream_version)
 
    if first_run:
@@ -112,7 +112,7 @@ def sync_table(conn_config, stream, state, desired_columns):
    escaped_schema  = schema_name
    escaped_table   = stream.table
    activate_version_message = singer.ActivateVersionMessage(
-      stream=stream.stream,
+      stream=stream.tap_stream_id,
       version=nascent_stream_version)
 
    if first_run:
