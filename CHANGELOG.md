@@ -22,3 +22,12 @@
 
 ## 0.3.0
  * Adds optional parameter `scn_window_size` to allow for an scn window during logminer replication [#18](https://github.com/singer-io/tap-oracle/pull/18)
+
+## (2020-05-19) - Pipelinewise 1.0.1 
+
+ * Fixed an issue when output messages were not compatible with `pipelinewise-transform-field` component
+
+## (2019-09-08) - Pipelinewise 1.0.0 
+
+ * Initial release and fork of singer `tap-oracle` 0.2.0
+ * use `trap_stream_id` as stream in singer messages to make it compatible with PipelineWise components
