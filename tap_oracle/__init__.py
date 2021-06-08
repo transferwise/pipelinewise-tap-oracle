@@ -44,6 +44,8 @@ STRING_TYPES = set([
     'varchar',
     'varchar2',
     'nvarchar2',
+    'clob',
+    'blob',
 ])
 
 FLOAT_TYPES = set([
@@ -84,7 +86,6 @@ def schema_for_column(c, pks_for_table):
    numeric_scale = c.numeric_scale if c.numeric_scale is not None else DEFAULT_NUMERIC_SCALE
    # Precision is always non-zero and defaults to 38 digits
    numeric_precision = c.numeric_precision or DEFAULT_NUMERIC_PRECISION
-
    if data_type == 'number' and numeric_scale <= 0:
       result.type = nullable_column(c.column_name, 'integer', pks_for_table)
 
@@ -102,6 +103,18 @@ def schema_for_column(c, pks_for_table):
       result.type = nullable_column(c.column_name, 'string', pks_for_table)
 
       result.format = 'date-time'
+      return result
+   
+   elif data_type == 'clob':
+      result.type = nullable_column(c.column_name, 'string', pks_for_table)
+      result.maxLength = 4294967295 #Technically 4GB -1 https://docs.oracle.com/cd/E18283_01/server.112/e17110/limits001.htm 
+      result.description = 'clob'
+      return result
+   
+   elif data_type == 'blob':
+      result.type = nullable_column(c.column_name, 'string', pks_for_table)
+      result.maxLength = 4294967295 #https://docs.oracle.com/cd/E18283_01/server.112/e17110/limits001.htm
+      result.description = 'blob'
       return result
 
    elif data_type in FLOAT_TYPES:
@@ -214,7 +227,6 @@ def produce_column_metadata(connection, table_info, table_schema, table_name, pk
 
       if row_count is not None:
          metadata.write(mdata, (), 'row-count', row_count)
-
    for c in cols:
       c_name = c.column_name
       # Write the data_type or "None" when the column has no datatype
