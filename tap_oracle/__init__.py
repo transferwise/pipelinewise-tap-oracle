@@ -52,7 +52,6 @@ FLOAT_TYPES = set([
 ])
 
 REQUIRED_CONFIG_KEYS = [
-    'sid',
     'host',
     'port',
     'user',
@@ -528,11 +527,15 @@ def do_sync(conn_config, catalog, default_replication_method, state):
 
 def main_impl():
    args = utils.parse_args(REQUIRED_CONFIG_KEYS)
+   if args.config.get('sid') == None and args.config.get('service_name') == None:
+      raise Exception("Config is missing either a sid or a service_name key")
+
    conn_config = {'user': args.config['user'],
                   'password': args.config['password'],
                   'host': args.config['host'],
                   'port': args.config['port'],
-                  'sid':  args.config['sid']}
+                  'sid':  args.config.get('sid'),
+                  'service_name': args.config.get('service_name')}
 
    if args.config.get('scn_window_size'):
       log_miner.SCN_WINDOW_SIZE=int(args.config['scn_window_size'])

@@ -7,7 +7,7 @@ def fully_qualified_column_name(schema, table, column):
     return '"{}"."{}"."{}"'.format(schema, table, column)
 
 def make_dsn(config):
-   return cx_Oracle.makedsn(config["host"], config["port"], config["sid"])
+   return cx_Oracle.makedsn(config["host"], config["port"], sid=config.get("sid"), service_name=config.get("service_name"))
 
 def open_connection(config):
     LOGGER.info("dsn: %s", make_dsn(config))
