@@ -536,6 +536,9 @@ def main_impl():
 
    if args.config.get('scn_window_size'):
       log_miner.SCN_WINDOW_SIZE=int(args.config['scn_window_size'])
+   if args.config.get('logminer_call_timeout'):
+      log_miner.CALL_TIMEOUT = int(args.config.get('logminer_call_timeout')) * 1000
+
    if args.discover:
       filter_schemas_prop = args.config.get('filter_schemas')
       filter_schemas = []

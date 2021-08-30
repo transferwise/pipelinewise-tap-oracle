@@ -19,6 +19,7 @@ LOGGER = singer.get_logger()
 UPDATE_BOOKMARK_PERIOD = 1000
 
 SCN_WINDOW_SIZE = None
+CALL_TIMEOUT = None
 
 def fetch_current_scn(conn_config):
    connection = orc_db.open_connection(conn_config)
@@ -90,6 +91,10 @@ def verify_table_supplemental_log_level(stream, connection):
 
 def sync_tables(conn_config, streams, state, end_scn, scn_window_size = None):
    connection = orc_db.open_connection(conn_config)
+
+   if CALL_TIMEOUT:
+      connection.call_timeout = CALL_TIMEOUT
+
    if not verify_db_supplemental_log_level(connection):
       for stream in streams:
          if not verify_table_supplemental_log_level(stream, connection):
