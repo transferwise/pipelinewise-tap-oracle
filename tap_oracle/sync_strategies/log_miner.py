@@ -13,6 +13,7 @@ import pdb
 import pytz
 import time
 import tap_oracle.sync_strategies.common as common
+import cx_Oracle
 
 LOGGER = singer.get_logger()
 
@@ -20,6 +21,8 @@ UPDATE_BOOKMARK_PERIOD = 1000
 
 SCN_WINDOW_SIZE = None
 CALL_TIMEOUT = None
+DYNAMIC_SCN_WINDOW_SIZE = False
+ITER_WITH_REDUCTION_FACTOR = 10
 
 def fetch_current_scn(conn_config):
    connection = orc_db.open_connection(conn_config)
@@ -111,14 +114,39 @@ def sync_tables(conn_config, streams, state, end_scn, scn_window_size = None):
 
    start_scn_window = min([get_bookmark(state, s.tap_stream_id, 'scn') for s in streams])
 
-   while start_scn_window < end_scn:
-      stop_scn_window = end_scn
-      if SCN_WINDOW_SIZE:
-         stop_scn_window = start_scn_window + SCN_WINDOW_SIZE
-         if stop_scn_window > end_scn:
-            stop_scn_window = end_scn
 
-      state = sync_tables_logminer(cur, streams, state, start_scn_window, stop_scn_window)
+   reduction_factor = 0
+   iter_with_reduction_factor = ITER_WITH_REDUCTION_FACTOR
+   while start_scn_window < end_scn:
+      stop_scn_window = min(start_scn_window + SCN_WINDOW_SIZE, end_scn) if SCN_WINDOW_SIZE else end_scn
+
+      if DYNAMIC_SCN_WINDOW_SIZE and reduction_factor > 0 and iter_with_reduction_factor > 0:
+         stop_scn_window = start_scn_window + int((stop_scn_window - start_scn_window) / (10 ** reduction_factor))
+
+      try:
+         state = sync_tables_logminer(cur, streams, state, start_scn_window, stop_scn_window)
+
+         if reduction_factor > 0:
+            iter_with_reduction_factor -= 1
+
+            if iter_with_reduction_factor == 0:
+                reduction_factor = max(0, reduction_factor - 1)
+                iter_with_reduction_factor = 10
+      except cx_Oracle.DatabaseError as ex:
+         iter_with_reduction_factor = ITER_WITH_REDUCTION_FACTOR
+         if DYNAMIC_SCN_WINDOW_SIZE and reduction_factor < 5:
+            reduction_factor += 1
+            connection = orc_db.open_connection(conn_config)
+            if CALL_TIMEOUT:
+                connection.call_timeout = CALL_TIMEOUT
+            cur = connection.cursor()
+            cur.execute("ALTER SESSION SET TIME_ZONE = '00:00'")
+            cur.execute("""ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD"T"HH24:MI:SS."00+00:00"'""")
+            cur.execute("""ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD"T"HH24:MI:SSXFF"+00:00"'""")
+            cur.execute("""ALTER SESSION SET NLS_TIMESTAMP_TZ_FORMAT  = 'YYYY-MM-DD"T"HH24:MI:SS.FFTZH:TZM'""")
+            continue
+         else:
+            raise ex
 
       start_scn_window = stop_scn_window
 

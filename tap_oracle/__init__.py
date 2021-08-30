@@ -538,6 +538,10 @@ def main_impl():
       log_miner.SCN_WINDOW_SIZE=int(args.config['scn_window_size'])
    if args.config.get('logminer_call_timeout'):
       log_miner.CALL_TIMEOUT = int(args.config.get('logminer_call_timeout')) * 1000
+   if args.config.get('logminer_dynamic_scn_window'):
+      log_miner.DYNAMIC_SCN_WINDOW_SIZE = bool(args.config.get('logminer_dynamic_scn_window'))
+   if args.config.get('logminer_iter_with_reduction_factor'):
+      log_miner.ITER_WITH_REDUCTION_FACTOR = int(args.config.get('logminer_iter_with_reduction_factor'))
 
    if args.discover:
       filter_schemas_prop = args.config.get('filter_schemas')
