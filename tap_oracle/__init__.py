@@ -288,6 +288,7 @@ def dump_catalog(catalog):
 
 def do_discovery(conn_config, filter_schemas):
    LOGGER.info("starting discovery")
+
    connection = orc_db.open_connection(conn_config)
    cur = connection.cursor()
 
@@ -535,7 +536,10 @@ def main_impl():
                   'host': args.config['host'],
                   'port': args.config['port'],
                   'sid':  args.config.get('sid'),
-                  'service_name': args.config.get('service_name')}
+                  'service_name': args.config.get('service_name'),
+                  'common_user': args.config.get('common_user'),
+                  'common_password': args.config.get('common_password'),
+                  'common_service_name': args.config.get('common_service_name')}
 
    if args.config.get('scn_window_size'):
       log_miner.SCN_WINDOW_SIZE=int(args.config['scn_window_size'])
