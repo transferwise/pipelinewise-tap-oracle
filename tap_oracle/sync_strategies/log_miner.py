@@ -24,8 +24,18 @@ CALL_TIMEOUT = None
 DYNAMIC_SCN_WINDOW_SIZE = False
 ITER_WITH_REDUCTION_FACTOR = 10
 
+
+def get_connection_with_common_user_or_default(conn_config):
+    cdb_conn_config = conn_config.copy()
+    if conn_config.get('common_user') and conn_config.get('common_password') and conn_config.get('common_service_name'):
+        cdb_conn_config['user'] = conn_config['common_user']
+        cdb_conn_config['password'] = conn_config['common_password']
+        cdb_conn_config['service_name'] = conn_config['common_service_name']
+
+    return orc_db.open_connection(cdb_conn_config)
+
 def fetch_current_scn(conn_config):
-   connection = orc_db.open_connection(conn_config)
+   connection = get_connection_with_common_user_or_default(conn_config)
    cur = connection.cursor()
    current_scn = cur.execute("SELECT current_scn FROM V$DATABASE").fetchall()[0][0]
    cur.close()
@@ -93,7 +103,7 @@ def verify_table_supplemental_log_level(stream, connection):
    return result is not None
 
 def sync_tables(conn_config, streams, state, end_scn, scn_window_size = None):
-   connection = orc_db.open_connection(conn_config)
+   connection = get_connection_with_common_user_or_default(conn_config)
 
    if CALL_TIMEOUT:
       connection.call_timeout = CALL_TIMEOUT
