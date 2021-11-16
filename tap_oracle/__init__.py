@@ -539,6 +539,7 @@ def main_impl():
                   'service_name': args.config.get('service_name'),
                   'common_user': args.config.get('common_user'),
                   'common_password': args.config.get('common_password'),
+                  'common_sid': args.config.get('common_sid'),
                   'common_service_name': args.config.get('common_service_name')}
 
    if args.config.get('scn_window_size'):

@@ -27,10 +27,11 @@ ITER_WITH_REDUCTION_FACTOR = 10
 
 def get_connection_with_common_user_or_default(conn_config):
     cdb_conn_config = conn_config.copy()
-    if conn_config.get('common_user') and conn_config.get('common_password') and conn_config.get('common_service_name'):
-        cdb_conn_config['user'] = conn_config['common_user']
-        cdb_conn_config['password'] = conn_config['common_password']
-        cdb_conn_config['service_name'] = conn_config['common_service_name']
+    if conn_config.get('common_user') and conn_config.get('common_password') and (conn_config.get('common_service_name') or conn_config.get('common_sid')):
+        cdb_conn_config['user'] = conn_config.get('common_user')
+        cdb_conn_config['password'] = conn_config.get('common_password')
+        cdb_conn_config['sid'] = conn_config.get('common_sid')
+        cdb_conn_config['service_name'] = conn_config.get('common_service_name')
 
     return orc_db.open_connection(cdb_conn_config)
 
