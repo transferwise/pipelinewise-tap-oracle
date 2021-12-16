@@ -142,12 +142,13 @@ def sync_tables(conn_config, streams, state, end_scn, scn_window_size = None):
 
             if iter_with_reduction_factor == 0:
                 reduction_factor = max(0, reduction_factor - 1)
-                iter_with_reduction_factor = 10
+                iter_with_reduction_factor = ITER_WITH_REDUCTION_FACTOR
       except cx_Oracle.DatabaseError as ex:
+         LOGGER.warning(f"Exception at start_scn={start_scn_window} stop_scn={stop_scn_window} reduction_factor={reduction_factor}")
          iter_with_reduction_factor = ITER_WITH_REDUCTION_FACTOR
          if DYNAMIC_SCN_WINDOW_SIZE and reduction_factor < 5:
             reduction_factor += 1
-            connection = orc_db.open_connection(conn_config)
+            connection = get_connection_with_common_user_or_default(conn_config)
             if CALL_TIMEOUT:
                 connection.call_timeout = CALL_TIMEOUT
             cur = connection.cursor()
