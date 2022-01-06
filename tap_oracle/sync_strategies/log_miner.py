@@ -144,6 +144,8 @@ def sync_tables(conn_config, streams, state, end_scn, scn_window_size = None):
                 reduction_factor = max(0, reduction_factor - 1)
                 iter_with_reduction_factor = ITER_WITH_REDUCTION_FACTOR
       except cx_Oracle.DatabaseError as ex:
+         cur.execute("DBMS_LOGMNR.END_LOGMNR()")
+         cur.close()
          LOGGER.warning(f"Exception at start_scn={start_scn_window} stop_scn={stop_scn_window} reduction_factor={reduction_factor}")
          iter_with_reduction_factor = ITER_WITH_REDUCTION_FACTOR
          if DYNAMIC_SCN_WINDOW_SIZE and reduction_factor < 5:
