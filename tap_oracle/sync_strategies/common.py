@@ -30,11 +30,8 @@ def row_to_singer_message(stream, row, version, columns, time_extracted):
     row_to_persist = ()
     for idx, elem in enumerate(row):
         property_type = stream.schema.properties[columns[idx]].type
-        property_format = stream.schema.properties[columns[idx]].format
         if elem is None:
             row_to_persist += (elem,)
-        elif ('string' in property_type or property_type == 'string') and property_format == 'singer.decimal':
-            row_to_persist += (str(elem),)
         elif 'integer' in property_type or property_type == 'integer':
             integer_representation = int(elem)
             row_to_persist += (integer_representation,)
@@ -50,8 +47,8 @@ def row_to_singer_message(stream, row, version, columns, time_extracted):
        time_extracted=time_extracted)
 
 def OutputTypeHandler(cursor, name, defaultType, size, precision, scale):
-    if defaultType == cx_Oracle.NUMBER:
-        return cursor.var(decimal.Decimal, arraysize = cursor.arraysize)
+   if defaultType == cx_Oracle.NUMBER:
+      return cursor.var(decimal.Decimal, arraysize = cursor.arraysize)
 
 
 def prepare_columns_sql(stream, c):
