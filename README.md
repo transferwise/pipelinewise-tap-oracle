@@ -100,10 +100,43 @@ Running the the tap requires a `config.json` file. Example with the minimal sett
     "port": 1521,
     "user": "my_user",
     "password": "password",
-    "sid": "ORCL",
-    "filter_schemas": "MY_USER" # optional
+    "service_name": "ORCL"
   }
 ```
+
+Optional:
+
+For older database or connecting to an instance you can use the legacy SID for the connection.
+Swap the `sid` keyword for `service_name`.
+
+```json
+  {
+    "sid": "ORCL"
+  }
+```
+
+Optional:
+
+To filter the discovery to a particular schema within a database. This is useful if you have a large number of schemas and wish to speed up the discovery.
+
+```json
+{
+  "filter_dbs": "your database schema name",
+}
+```
+
+Optional:
+
+Support for a common user for working with pluggable databases (PDB). Every common user can connect to an perform operations within the root database, and within any PDB in which it has privileges.
+
+```json
+{
+  "common_user": "common_user_defined_in_oracle",
+  "common_password": "common_user_password",
+  "common_service_name": "common_user_service_connection_name",
+}
+```
+
 
 ### To run tests:
 
