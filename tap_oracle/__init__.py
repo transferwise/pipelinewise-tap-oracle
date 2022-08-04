@@ -567,6 +567,7 @@ def main_impl():
       log_miner.ITER_WITH_REDUCTION_FACTOR = int(args.config.get('logminer_iter_with_reduction_factor'))
    if args.config.get('full_table_sync_batch_size'):
       full_table.BATCH_SIZE = int(args.config.get('full_table_sync_batch_size'))
+   full_table.USE_ORA_ROWSCN = bool(args.config.get('use_ora_rowscn', True))
 
    if args.discover:
       filter_schemas_prop = args.config.get('filter_schemas')

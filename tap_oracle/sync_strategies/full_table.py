@@ -18,6 +18,8 @@ UPDATE_BOOKMARK_PERIOD = 1000
 
 BATCH_SIZE = 100
 
+USE_ORA_ROWSCN = True
+
 def sync_view(conn_config, stream, state, desired_columns):
    connection = orc_db.open_connection(conn_config)
    connection.outputtypehandler = common.OutputTypeHandler
@@ -120,7 +122,13 @@ def sync_table(conn_config, stream, state, desired_columns):
 
    with metrics.record_counter(None) as counter:
       ora_rowscn = singer.get_bookmark(state, stream.tap_stream_id, 'ORA_ROWSCN')
-      if ora_rowscn:
+      if not USE_ORA_ROWSCN:
+         # Warning there is not restart recovery if the ORA_ROWSCN is ignored.
+         select_sql      = """SELECT {}
+                                FROM {}.{}""".format(','.join(escaped_columns),
+                                           escaped_schema,
+                                           escaped_table)
+      elif ora_rowscn:
          LOGGER.info("Resuming Full Table replication %s from ORA_ROWSCN %s", nascent_stream_version, ora_rowscn)
          select_sql      = """SELECT {}, ORA_ROWSCN
                                 FROM {}.{}
