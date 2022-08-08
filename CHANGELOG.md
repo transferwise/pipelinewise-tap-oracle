@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.1.5
+ * Large change to incorporate a number of cherry-picked features plus new features, table_filtering, no ora_rowscn full table loads.
+   * Reverting commits for treating decimals and floats as singer.decimal.
+   * Bumping cx_Oracle to 8.2
+   * Adding query timeouts
+   * Adding support to connect via service_name
+   * Dynamically reduce the SCN_WINDOW_SIZE with timeouts occur
+   * Support for Plugable database connections
+   * Bumping singer-python to version 5.12.2
+   * Allow full_table with no ORA_ROWSCN and order by clause. Note: Not restartable.
+   * Adding Datetime, Date, NCLOB, CLOB, and BLOB datatypes
+   * Discovery filter to set tables via ENV `MELTANO_EXTRACT__SELECT` or config item `filter_tables`.
+
+
+
+
 ## 1.1.2
  * Log value of mine_sql [#30](https://github.com/singer-io/tap-oracle/pull/30)
 
