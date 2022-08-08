@@ -638,8 +638,8 @@ def main_impl():
       if args.config.get('filter_schemas'):
          filter_schemas = args.config.get('filter_schemas').split(',')
       filter_tables = []
-      if args.config.get('_select'):
-        filter_tables = args.config.get('_select')
+      if args.config.get('_select',os.getenv('TAP_ORACLE__SELECT')):
+         filter_tables = json.loads(args.config.get('_select',os.getenv('TAP_ORACLE__SELECT')))
 
       do_discovery(conn_config, filter_schemas, filter_tables)
 
