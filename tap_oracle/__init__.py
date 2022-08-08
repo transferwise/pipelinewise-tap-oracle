@@ -68,6 +68,8 @@ DEFAULT_NUMERIC_PRECISION=38
 # align with the Singer libraries' maximum.
 DEFAULT_NUMERIC_SCALE=38
 
+# TABLES_FILTER=""
+
 def nullable_column(col_name, col_type, pks_for_table):
    if col_name in pks_for_table:
       return  [col_type]
@@ -274,10 +276,16 @@ def produce_column_metadata(connection, table_info, table_schema, table_name, pk
 
    return mdata
 
-def discover_columns(connection, table_info, filter_schemas):
+def discover_columns(connection, table_info, filter_schemas, filter_tables):
    cur = connection.cursor()
    binds_sql = [":{}".format(b) for b in range(len(filter_schemas))]
    filter = filter_sys_or_not(filter_schemas)
+
+   if filter_tables:
+      # Restrict columns to tables/views based on filter_table
+      table_filter = """owner||'-'||table_name IN ({})""".format(','.join(f"'{t.rstrip('.*')}'" for t in filter_tables))
+      filter = f"{table_filter} AND {filter}"
+
    if binds_sql:
       sql = f"""
       SELECT OWNER,
@@ -345,7 +353,7 @@ def discover_columns(connection, table_info, filter_schemas):
 def dump_catalog(catalog):
    catalog.dump()
 
-def do_discovery(conn_config, filter_schemas):
+def do_discovery(conn_config, filter_schemas, filter_tables):
    LOGGER.info("starting discovery")
 
    connection = orc_db.open_connection(conn_config)
@@ -362,6 +370,11 @@ def do_discovery(conn_config, filter_schemas):
    SELECT owner, table_name
    FROM all_tables
    WHERE {filter}""", binds_sql)
+
+   if filter_tables:
+      # Restrict tables to tables in _SELECT environment variable
+      LOGGER.info(f"Tables are being filtered : {filter_tables}")
+      sql = sql + """ AND owner||'-'||table_name IN ({})""".format(','.join(f"'{t.rstrip('.*')}'" for t in filter_tables))
 
    LOGGER.info("fetching tables: %s %s", sql, filter_schemas)
    for row in cur.execute(sql, filter_schemas):
@@ -383,7 +396,12 @@ def do_discovery(conn_config, filter_schemas):
    FROM sys.all_views
    WHERE {filter}""", binds_sql)
 
-   LOGGER.info("fetching views")
+   if filter_tables:
+      # Restrict views to views in _SELECT environment variable
+      LOGGER.info(f"Views are being filtered : {filter_tables}")
+      sql = sql + """ AND owner||'-'||view_name IN ({})""".format(','.join(f"'{t.rstrip('.*')}'" for t in filter_tables))
+
+   LOGGER.info("fetching views: %s %s", sql, filter_schemas)
    for row in cur.execute(sql, filter_schemas):
      view_name = row[1]
      schema = row[0]
@@ -394,7 +412,7 @@ def do_discovery(conn_config, filter_schemas):
         'is_view': True
      }
 
-   catalog = discover_columns(connection, table_info, filter_schemas)
+   catalog = discover_columns(connection, table_info, filter_schemas, filter_tables)
    dump_catalog(catalog)
    cur.close()
    connection.close()
@@ -619,7 +637,11 @@ def main_impl():
       filter_schemas = []
       if args.config.get('filter_schemas'):
          filter_schemas = args.config.get('filter_schemas').split(',')
-      do_discovery(conn_config, filter_schemas)
+      filter_tables = []
+      if args.config.get('_select'):
+        filter_tables = args.config.get('_select')
+
+      do_discovery(conn_config, filter_schemas, filter_tables)
 
    elif args.catalog:
       state = args.state
