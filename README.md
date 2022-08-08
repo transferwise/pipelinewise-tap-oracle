@@ -121,7 +121,19 @@ To filter the discovery to a particular schema within a database. This is useful
 
 ```json
 {
-  "filter_dbs": "your database schema name",
+  "filter_schemas": "your database schema name",
+}
+```
+
+Optional:
+
+To filter the discovery to a particular list of tables in a database. This is useful if you have a large number of tables in a schema and wish to speed up the discovery.
+Note: There is a format feature each table of ["SCHEMA-TABLE"] and should follow JSON arry literal formatting.
+You can also filter tables by setting an environment variable `MELTANO_EXTRACT__SELECT`. e.g. export MELTANO_EXTRACT__SELECT='["HR-EMPLOYEES", "HR-DEPARTMENTS"]'
+
+```json
+{
+  "filter_tables": ["HR-EMPLOYEES", "HR-DEPARTMENTS"],
 }
 ```
 

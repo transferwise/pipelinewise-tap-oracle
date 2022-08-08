@@ -637,9 +637,16 @@ def main_impl():
       filter_schemas = []
       if args.config.get('filter_schemas'):
          filter_schemas = args.config.get('filter_schemas').split(',')
+
+      # Discovering any filters applied for restricting list of tables to discover
       filter_tables = []
-      if args.config.get('_select',os.getenv('TAP_ORACLE__SELECT')):
-         filter_tables = json.loads(args.config.get('_select',os.getenv('TAP_ORACLE__SELECT')))
+      filter_tables_env = []
+      if os.getenv('MELTANO_EXTRACT__SELECT'):
+         filter_tables_env = json.loads(os.getenv('MELTANO_EXTRACT__SELECT'))
+      if args.config.get('filter_tables',filter_tables_env):
+         filter_tables = args.config.get('filter_tables',filter_tables_env)
+         if filter_tables[0] == "*.*":
+            filter_tables = []
 
       do_discovery(conn_config, filter_schemas, filter_tables)
 
