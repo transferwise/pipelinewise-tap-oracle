@@ -124,7 +124,7 @@ def sync_table(conn_config, stream, state, desired_columns):
       ora_rowscn = singer.get_bookmark(state, stream.tap_stream_id, 'ORA_ROWSCN')
       if not USE_ORA_ROWSCN:
          # Warning there is not restart recovery if the ORA_ROWSCN is ignored.
-         select_sql      = """SELECT {}
+         select_sql      = """SELECT {}, NULL as ORA_ROWSCN
                                 FROM {}.{}""".format(','.join(escaped_columns),
                                            escaped_schema,
                                            escaped_table)
