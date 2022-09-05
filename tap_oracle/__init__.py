@@ -89,30 +89,30 @@ def schema_for_column(c, pks_for_table, use_singer_decimal):
    numeric_scale = c.numeric_scale if c.numeric_scale is not None else DEFAULT_NUMERIC_SCALE
    # Precision is always non-zero and defaults to 38 digits
    numeric_precision = c.numeric_precision or DEFAULT_NUMERIC_PRECISION
-   #Bool 
+   #Bool
    if data_type == 'number' and numeric_scale == 0 and numeric_precision == 1:
       result.type = nullable_column(c.column_name, 'boolean', pks_for_table)
       return result
 
-   elif data_type == 'number' and numeric_scale is not None and numeric_scale <= 0:
+   elif data_type == 'number' and (numeric_scale <= 0
+                                or ( numeric_scale == DEFAULT_NUMERIC_SCALE and
+                                     numeric_precision == DEFAULT_NUMERIC_PRECISION)):
       result.type = nullable_column(c.column_name, 'integer', pks_for_table)
 
-      if numeric_scale < 0:
-         result.multipleOf = -10 * numeric_scale
       return result
 
    elif data_type == 'number':
       if use_singer_decimal: # Using custom `singer.decimal` string formatter, no opinion on scale/precision
          result.type = nullable_column(c.column_name, 'string', pks_for_table)
          result.format = "singer.decimal"
-         result.additionalProperties = {"scale_precision": f"({c.numeric_precision},{c.numeric_scale})"}
+         result.additionalProperties = {"scale_precision": f"({c.numeric_precision or DEFAULT_NUMERIC_PRECISION},{c.numeric_scale})"}
       else:
          result.type = nullable_column(c.column_name, 'number', pks_for_table)
          result.multipleOf = 10 ** (0 - numeric_scale)
 
       return result
 
-   elif data_type == 'date': 
+   elif data_type == 'date':
       result.type = nullable_column(c.column_name, 'string', pks_for_table)
       result.description = 'date'
       result.format = 'date-time'
