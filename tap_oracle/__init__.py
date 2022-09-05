@@ -94,9 +94,7 @@ def schema_for_column(c, pks_for_table, use_singer_decimal):
       result.type = nullable_column(c.column_name, 'boolean', pks_for_table)
       return result
 
-   elif data_type == 'number' and (numeric_scale <= 0
-                                or ( numeric_scale == DEFAULT_NUMERIC_SCALE and
-                                     numeric_precision == DEFAULT_NUMERIC_PRECISION)):
+   elif data_type == 'number' and numeric_scale <= 0:
       result.type = nullable_column(c.column_name, 'integer', pks_for_table)
 
       return result
@@ -105,7 +103,8 @@ def schema_for_column(c, pks_for_table, use_singer_decimal):
       if use_singer_decimal: # Using custom `singer.decimal` string formatter, no opinion on scale/precision
          result.type = nullable_column(c.column_name, 'string', pks_for_table)
          result.format = "singer.decimal"
-         result.additionalProperties = {"scale_precision": f"({c.numeric_precision or DEFAULT_NUMERIC_PRECISION},{c.numeric_scale})"}
+         if not (  numeric_scale == DEFAULT_NUMERIC_SCALE and numeric_precision == DEFAULT_NUMERIC_PRECISION):
+            result.additionalProperties = {"scale_precision": f"({c.numeric_precision or DEFAULT_NUMERIC_PRECISION},{c.numeric_scale})"}
       else:
          result.type = nullable_column(c.column_name, 'number', pks_for_table)
          result.multipleOf = 10 ** (0 - numeric_scale)
