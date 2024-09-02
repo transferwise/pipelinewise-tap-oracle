@@ -1,3 +1,10 @@
+# Notice
+To better serve Wise business and customer needs, the PipelineWise codebase needs to shrink.
+We have made the difficult decision that, going forward many components of PipelineWise will be removed or incorporated in the main repo.
+The last version before this decision is [v0.64.1](https://github.com/transferwise/pipelinewise/tree/v0.64.1)
+
+We thank all in the open-source community, that over the past 6 years, have helped to make PipelineWise a robust product for heterogeneous replication of many many Terabytes, daily
+
 # pipelinewise-tap-oracle
 
 [![PyPI version](https://badge.fury.io/py/pipelinewise-tap-oracle.svg)](https://badge.fury.io/py/pipelinewise-tap-oracle)
@@ -24,7 +31,7 @@ Tap-Oracle Log-based replication requires some configuration changes in Oracle d
 
 * Enable Supplemental logging
 
-### Setting up Log-based replication on a self hosted Oracle Database: 
+### Setting up Log-based replication on a self hosted Oracle Database:
 
 To verify the current archiving mode, if the result is `ARCHIVELOG`, archiving is enabled:
 ```
